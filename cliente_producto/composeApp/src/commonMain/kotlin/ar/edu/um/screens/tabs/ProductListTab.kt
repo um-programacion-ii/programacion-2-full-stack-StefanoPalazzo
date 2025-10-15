@@ -60,6 +60,25 @@ object ProductListTab : Tab {
         var productList by remember { mutableStateOf<List<Product>>(emptyList()) }
         var isLoading by remember { mutableStateOf(false) }
 
+        // dentro de ProductListTab.Content()
+
+        fun deleteProduct(id: Long) {
+            scope.launch {
+                try {
+                    val ok = apiService.deleteProduct(id)
+                    if (ok) {
+                        // reflejar el borrado en la UI
+                        productList = productList.filterNot { it.id == id }
+                    } else {
+                        println("DELETE falló para id=$id")
+                    }
+                } catch (e: Exception) {
+                    println("Error al borrar: ${e.message}")
+                }
+            }
+        }
+
+
         fun loadProducts() {
             scope.launch {
                 isLoading = true
@@ -76,9 +95,7 @@ object ProductListTab : Tab {
         LaunchedEffect(Unit){
             loadProducts()
         }
-        fun deleteProduct(id: Long){
 
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -118,7 +135,7 @@ fun ProductItem(product: Product, onDelete:() -> Unit){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

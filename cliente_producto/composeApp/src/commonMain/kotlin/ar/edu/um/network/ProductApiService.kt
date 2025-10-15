@@ -10,6 +10,7 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 
 class ProductApiService(private val baseUrl: String = "http://10.0.2.2:8080") {
     private val httpClient = NetworkUtils.httpClient
@@ -44,11 +45,7 @@ class ProductApiService(private val baseUrl: String = "http://10.0.2.2:8080") {
     }
 
     suspend fun deleteProduct(id: Long): Boolean {
-        return try {
-            httpClient.delete("$baseUrl/products/$id")
-            true
-        } catch (e: Exception) {
-            false
-        }
+        val res = httpClient.delete("$baseUrl/products/$id")
+        return res.status.isSuccess()
     }
 }
